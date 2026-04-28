@@ -27,10 +27,15 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-默认数据库地址可通过 `DATABASE_URL` 配置，例如：
+数据库连接请使用环境变量，不要在文档中写死账号、密码或网络地址。可通过 `DATABASE_URL` 配置，例如：
 
 ```bash
-export DATABASE_URL=postgresql+psycopg://roadbike:roadbike@localhost:5432/roadbike
+export DB_USER="<your_db_user>"
+export DB_PASSWORD="<your_db_password>"
+export DB_HOST="<your_db_host>"
+export DB_PORT="<your_db_port>"
+export DB_NAME="<your_db_name>"
+export DATABASE_URL="postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
 ```
 
 ## 前端启动
@@ -41,7 +46,11 @@ npm install
 npm run dev
 ```
 
-默认 API 地址为 `http://localhost:8000`，可通过 `NEXT_PUBLIC_API_BASE_URL` 覆盖。
+前端 API 基础地址请通过环境变量配置（避免写死网络地址）：
+
+```bash
+export NEXT_PUBLIC_API_BASE_URL="<your_api_base_url>"
+```
 
 品牌 CDN 图片会先经 `/api/image-cache` 拉取并落在本地磁盘（默认 `frontend/.cache/image-cache`，可用环境变量 `IMAGE_CACHE_DIR` 修改），浏览器侧响应头为长期缓存 `max-age=31536000`；白名单与 `next.config.mjs` 的 `remotePatterns` 一致。
 
