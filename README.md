@@ -1,6 +1,6 @@
 # 公路车商品数据聚合平台
 
-这是基于计划文件落地的可运行项目骨架，目标是聚合 Canyon、Specialized、Trek、Giant、Pinarello 等品牌官网的公路车商品数据。
+目标是聚合 Canyon、Specialized、Trek、Giant、Pinarello 等品牌官网的公路车商品数据。
 
 ## 目录
 
