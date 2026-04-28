@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: docker.m.daocloud.io/postgres:16
+    environment:
+      POSTGRES_DB: roadbike
+      POSTGRES_USER: roadbike
+      POSTGRES_PASSWORD: roadbike
+    ports:
+      - "5432:5432"
+    volumes:
+      - roadbike-postgres:/var/lib/postgresql/data
+
+  redis:
+    image: docker.m.daocloud.io/redis:7
+    ports:
+      - "6379:6379"
+
+  backend-worker:
+    build:
+      context: ./backend
+    command: celery -A app.core.celery_app.celery_app worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql+psycopg://roadbike:roadbike@postgres:5432/roadbike
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      CELERY_TIMEZONE: Asia/Shanghai
+      TZ: Asia/Shanghai
+      SNAPSHOT_DIR: /app/data/snapshots
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - backend-snapshots:/app/data/snapshots
+
+  backend-beat:
+    build:
+      context: ./backend
+    command: celery -A app.core.celery_app.celery_app beat --loglevel=info
+    environment:
+      DATABASE_URL: postgresql+psycopg://roadbike:roadbike@postgres:5432/roadbike
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+      CELERY_TIMEZONE: Asia/Shanghai
+      TZ: Asia/Shanghai
+      SNAPSHOT_DIR: /app/data/snapshots
+    depends_on:
+      - postgres
+      - redis
+      - backend-worker
+    volumes:
+      - backend-snapshots:/app/data/snapshots
+
+volumes:
+  roadbike-postgres:
+  backend-snapshots:
